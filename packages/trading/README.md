@@ -134,6 +134,87 @@ view_pnl()                             // Realized + unrealized P&L
 3. **Stress test** — Strategy survives 2008, COVID, 2022 bear markets
 4. **Live small** — Start with $1k account, scale after 1 month of profitability
 
+## Execution Seam
+
+The `execution/` package group provides the core execution capability seam with multiple provider implementations:
+
+### Core Package: `@deepseek-ai/dsh-execution`
+
+Defines the abstract `ExecutionService` class with these methods:
+
+- **`placeOrder(request)`** — Place an order and await initial acceptance
+- **`cancelOrder(request)`** — Cancel an open order (best-effort)
+- **`getOrderStatus(request)`** — Get current order status and fills
+- **`validate(request, config)`** — Validate order before execution
+- **`estimateExecutionCost(request)`** — Pre-flight cost estimation
+- **`listOrders()`** — List all orders
+
+### Providers
+
+- **`@deepseek-ai/dsh-execution-paper`** — Paper trading with configurable slippage (testing, demos)
+- **`@deepseek-ai/dsh-execution-robinhood`** — Real Robinhood equity orders via MCP
+- **`@deepseek-ai/dsh-execution-polymarket`** — Polymarket prediction market orders via API
+
+### Order Types
+
+```ts
+interface Order {
+  orderId: OrderId
+  symbol: string
+  side: 'buy' | 'sell'
+  type: 'limit' | 'market'
+  quantity: number
+  filledQuantity: number
+  status: OrderStatus // 'pending' | 'open' | 'filled' | 'cancelled' | 'rejected'
+  fills: Fill[] // Array of partial fills
+  avgFillPrice?: number
+  createdAt: number
+  updatedAt: number
+}
+```
+
+### Validation & Error Handling
+
+Order validation is reusable across providers:
+
+```ts
+import { validateOrder } from '@deepseek-ai/dsh-execution/validation'
+
+const result = validateOrder(request, {
+  minOrderSize: 1,
+  maxOrderSize: 100000,
+  allowFractional: true,
+  minTickSize: 0.01,
+  availableBalance: 50000,
+})
+
+if (!result.valid) {
+  console.error('Errors:', result.errors)
+  console.warn('Warnings:', result.warnings)
+}
+```
+
+Errors are structured for programmatic handling:
+
+```ts
+import { ExecutionErrorException } from '@deepseek-ai/dsh-execution/errors'
+
+try {
+  await ctx.execution.placeOrder(request)
+} catch (err) {
+  if (err instanceof ExecutionErrorException) {
+    switch (err.error.code) {
+      case 'insufficient_balance':
+        // Handle balance issue
+        break
+      case 'execution_rejected':
+        // Handle provider rejection
+        break
+    }
+  }
+}
+```
+
 ## Status
 
-**In progress** — Initial plugin implementation underway.
+**In progress** — Initial execution seam implementation complete; provider MCP/API integration in progress.

@@ -46,6 +46,22 @@ export type {
   ValidationResult,
 } from './types.ts'
 
+export {
+  validationError,
+  insufficientBalanceError,
+  orderNotFoundError,
+  executionRejectedError,
+  executionFailedError,
+  networkError,
+  providerError,
+  throwExecutionError,
+  ExecutionErrorException,
+  isExecutionError,
+  toExecutionError,
+} from './errors.ts'
+
+export { validateOrder, validateQuantityAndPrice } from './validation.ts'
+
 declare module '@deepseek-ai/cordis' {
   interface Context {
     execution: ExecutionService
