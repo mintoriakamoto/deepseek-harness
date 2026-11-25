@@ -7,13 +7,42 @@
 import type { Branded } from '@deepseek-ai/dsh-brand'
 
 /** Opaque market data subscription handle, branded to prevent cross-provider confusion. */
-export type SubscriptionId = Branded<string, 'market-data:subscription-id'>
+export type SubscriptionId = Branded<'market-data:subscription-id'>
 
 /** OHLCV bar interval identifier (1m, 5m, 15m, 1h, 1d). */
 export type BarInterval = '1m' | '5m' | '15m' | '1h' | '1d'
 
-/** Provider identifier (e.g., 'robinhood', 'polymarket', 'browser'). */
-export type MarketDataProvider = string
+/**
+ * Provider registration: implementation of one or more market data operations
+ * (getQuote, getBars, subscribe, getSentiment). A provider declares its supported
+ * operations; fallback proceeds to the next registered provider on unsupported operation.
+ */
+export interface MarketDataProvider {
+  /** Provider identifier (e.g., 'robinhood', 'polymarket', 'browser'). */
+  readonly name: string
+
+  /**
+   * Get a real-time quote. Optional; consumer receives error if unsupported.
+   */
+  getQuote?: (symbol: string) => Promise<Quote>
+
+  /**
+   * Get historical bars. Optional; consumer receives error if unsupported.
+   */
+  getBars?: (symbol: string, interval: BarInterval, count: number) => Promise<readonly Bar[]>
+
+  /**
+   * Subscribe to real-time updates. Optional; consumer receives error if unsupported.
+   * Callback may be async; implementation awaits each invocation (backpressure).
+   * Returned subscription must include {@link QuoteSubscription.dispose}.
+   */
+  subscribe?: (symbol: string, callback: QuoteSubscriptionCallback) => Promise<QuoteSubscription>
+
+  /**
+   * Get aggregated sentiment. Optional; consumer receives error if unsupported.
+   */
+  getSentiment?: (symbols: readonly string[]) => Promise<readonly Sentiment[]>
+}
 
 /**
  * Complete real-time quote for one symbol: price, bid/ask, volume,
