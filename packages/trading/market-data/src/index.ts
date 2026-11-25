@@ -11,7 +11,7 @@
 import { Context, Service, symbols } from '@deepseek-ai/cordis'
 import { randomUUID } from 'node:crypto'
 import type { Fiber } from '@deepseek-ai/cordis'
-import { brand } from '@deepseek-ai/dsh-brand'
+import type { Branded } from '@deepseek-ai/dsh-brand'
 import type {
   Bar,
   BarInterval,
@@ -31,38 +31,6 @@ declare module '@deepseek-ai/cordis' {
   interface Context {
     marketData: MarketDataRegistry
   }
-}
-
-/**
- * Provider registration: implementation of one or more market data operations
- * (getQuote, getBars, subscribe, getSentiment). A provider declares its supported
- * operations; fallback proceeds to the next registered provider on unsupported operation.
- */
-export interface MarketDataProvider {
-  /** Provider identifier (e.g., 'robinhood', 'polymarket', 'browser'). */
-  readonly name: string
-
-  /**
-   * Get a real-time quote. Optional; consumer receives error if unsupported.
-   */
-  getQuote?: (symbol: string) => Promise<Quote>
-
-  /**
-   * Get historical bars. Optional; consumer receives error if unsupported.
-   */
-  getBars?: (symbol: string, interval: BarInterval, count: number) => Promise<readonly Bar[]>
-
-  /**
-   * Subscribe to real-time updates. Optional; consumer receives error if unsupported.
-   * Callback may be async; implementation awaits each invocation (backpressure).
-   * Returned subscription must include {@link QuoteSubscription.dispose}.
-   */
-  subscribe?: (symbol: string, callback: QuoteSubscriptionCallback) => Promise<QuoteSubscription>
-
-  /**
-   * Get aggregated sentiment. Optional; consumer receives error if unsupported.
-   */
-  getSentiment?: (symbols: readonly string[]) => Promise<readonly Sentiment[]>
 }
 
 /**
@@ -103,7 +71,7 @@ export class MarketDataRegistry extends Service implements MarketDataService {
     }
   }
 
-  async getQuote(symbol: string, providerFilter?: MarketDataProvider): Promise<Quote> {
+  async getQuote(symbol: string, providerFilter?: string): Promise<Quote> {
     const providers = providerFilter
       ? this.providers.filter(p => p.provider.name === providerFilter)
       : this.providers
@@ -141,7 +109,7 @@ export class MarketDataRegistry extends Service implements MarketDataService {
     symbol: string,
     interval: BarInterval,
     count: number,
-    providerFilter?: MarketDataProvider,
+    providerFilter?: string,
   ): Promise<readonly Bar[]> {
     const providers = providerFilter
       ? this.providers.filter(p => p.provider.name === providerFilter)
@@ -179,7 +147,7 @@ export class MarketDataRegistry extends Service implements MarketDataService {
   async subscribe(
     symbol: string,
     callback: QuoteSubscriptionCallback,
-    providerFilter?: MarketDataProvider,
+    providerFilter?: string,
   ): Promise<QuoteSubscription> {
     const providers = providerFilter
       ? this.providers.filter(p => p.provider.name === providerFilter)
@@ -216,7 +184,7 @@ export class MarketDataRegistry extends Service implements MarketDataService {
 
   async getSentiment(
     symbols: readonly string[],
-    providerFilter?: MarketDataProvider,
+    providerFilter?: string,
   ): Promise<readonly Sentiment[]> {
     const providers = providerFilter
       ? this.providers.filter(p => p.provider.name === providerFilter)
@@ -257,5 +225,5 @@ export class MarketDataRegistry extends Service implements MarketDataService {
  * @internal
  */
 export function createSubscriptionId(): SubscriptionId {
-  return brand<SubscriptionId>(randomUUID())
+  return randomUUID() as SubscriptionId
 }
