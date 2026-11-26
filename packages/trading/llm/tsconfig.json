@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "paths": {
+      "@deepseek-ai/dsh-llm-trading": ["./src/index.ts"],
+      "@deepseek-ai/dsh-llm-trading/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": []
+}

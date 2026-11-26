@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "paths": {
+      "@deepseek-ai/dsh-strategy-backtest-validator": ["./src/index.ts"],
+      "@deepseek-ai/dsh-strategy-backtest-validator/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": []
+}
