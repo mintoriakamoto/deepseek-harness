@@ -19861,6 +19861,21 @@ importers:
         specifier: workspace:*
         version: link:../../interaction/user-questions
 
+  packages/trading/execution:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+
+  packages/trading/execution-questrade:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+
   packages/typert/generator:
     dependencies:
       '@jridgewell/gen-mapping':
