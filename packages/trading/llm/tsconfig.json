@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../core/cordis" },
+    { "path": "../../core/session" },
+    { "path": "../execution" },
+    { "path": "../market-data" },
+    { "path": "../../util/values" }
+  ]
+}
