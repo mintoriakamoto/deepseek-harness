@@ -1,0 +1,10 @@
+presets:
+  - name: 'trading-paper'
+    description: 'Paper trading validation mode (live feeds, no capital at risk)'
+    plugins:
+      - '@deepseek-ai/dsh-market-data'
+      - '@deepseek-ai/dsh-market-data-browser'
+      - '@deepseek-ai/dsh-execution'
+      - '@deepseek-ai/dsh-execution-paper'
+      - '@deepseek-ai/dsh-risk-simple'
+      - '@deepseek-ai/dsh-llm-trading'
