@@ -27,9 +27,9 @@ import { MarketDataError } from '@deepseek-ai/dsh-market-data'
  */
 export interface ScraperSourceConfig {
   /** Enable this source (default: true). */
-  enabled?: boolean
+  enabled: boolean
   /** Source weight in final sentiment score (default: 1.0). */
-  weight?: number
+  weight: number
 }
 
 /**
@@ -38,11 +38,22 @@ export interface ScraperSourceConfig {
 export interface BrowserSentimentConfig {
   /** Playwright timeout per operation, milliseconds (default: 30000). */
   timeoutMs?: number
-  /** Sentiment sources to enable/weight. */
+  /** Sentiment sources to enable/weight (all optional in config, defaults applied). */
   sources?: {
-    news?: ScraperSourceConfig
-    twitter?: ScraperSourceConfig
-    analystRatings?: ScraperSourceConfig
+    news?: {
+      /** Enable this source (default: true). */
+      enabled?: boolean
+      /** Source weight in final sentiment score (default: 1.0). */
+      weight?: number
+    }
+    twitter?: {
+      enabled?: boolean
+      weight?: number
+    }
+    analystRatings?: {
+      enabled?: boolean
+      weight?: number
+    }
   }
   /** Enable debug logging and screenshots. */
   debug?: boolean
@@ -59,13 +70,15 @@ export interface BrowserSentimentConfig {
 export class BrowserSentimentProvider implements MarketDataProvider {
   readonly name = 'browser'
 
-  private timeoutMs: number
-  private sourceConfigs: Required<Required<BrowserSentimentConfig>['sources']>
+  private sourceConfigs: {
+    news: { enabled: boolean; weight: number }
+    twitter: { enabled: boolean; weight: number }
+    analystRatings: { enabled: boolean; weight: number }
+  }
   private debug: boolean
   private maxConcurrency: number
 
-  constructor(ctx: Context, config: BrowserSentimentConfig = {}) {
-    this.timeoutMs = config.timeoutMs ?? 30_000
+  constructor(_ctx: Context, config: BrowserSentimentConfig = {}) {
     this.debug = config.debug ?? false
     this.maxConcurrency = config.maxConcurrency ?? 3
 
@@ -97,7 +110,7 @@ export class BrowserSentimentProvider implements MarketDataProvider {
   /**
    * Bars not supported by browser sentiment provider.
    */
-  async getBars(symbol: string, interval: BarInterval, count: number): Promise<readonly Bar[]> {
+  async getBars(symbol: string, _interval: BarInterval, _count: number): Promise<readonly Bar[]> {
     this.log(`getBars(${symbol}) — not supported`)
     throw new MarketDataError('Browser sentiment provider does not support bars', 'OPERATION_NOT_SUPPORTED')
   }
@@ -107,7 +120,7 @@ export class BrowserSentimentProvider implements MarketDataProvider {
    */
   async subscribe(
     symbol: string,
-    callback: QuoteSubscriptionCallback,
+    _callback: QuoteSubscriptionCallback,
   ): Promise<QuoteSubscription> {
     this.log(`subscribe(${symbol}) — not supported`)
     throw new MarketDataError('Browser sentiment provider does not support subscriptions', 'OPERATION_NOT_SUPPORTED')

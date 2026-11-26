@@ -14,7 +14,6 @@ import type {
   GetOrderStatusRequest,
   GetOrderStatusResult,
   Order,
-  Fill,
   ValidationConfig,
   ValidationResult,
 } from '@deepseek-ai/dsh-execution'
@@ -37,17 +36,13 @@ export interface PolymarketExecutionConfig {
  * market trading on Polymarket. Requires Polymarket API credentials.
  */
 export class PolymarketExecutionService extends ExecutionServiceBase {
-  private readonly apiUrl: string
-  private readonly apiKey?: string
   private readonly maxOrderSize: number
   private cachedBalance: number | null = null
   private lastBalanceRefresh: number = 0
   private readonly balanceCacheTtl = 60000 // 1 minute
 
-  constructor(ctx: Context, config: PolymarketExecutionConfig = {}) {
-    super(ctx)
-    this.apiUrl = config.apiUrl ?? 'https://api.polymarket.com'
-    this.apiKey = config.apiKey
+  constructor(_ctx: Context, config: PolymarketExecutionConfig = {}) {
+    super(_ctx)
     this.maxOrderSize = config.maxOrderSize ?? 10000
   }
 
@@ -136,7 +131,7 @@ export class PolymarketExecutionService extends ExecutionServiceBase {
     return { order }
   }
 
-  async cancelOrder(request: CancelOrderRequest): Promise<CancelOrderResult> {
+  async cancelOrder(_request: CancelOrderRequest): Promise<CancelOrderResult> {
     // In a real implementation, this would call the Polymarket API to cancel the order
     // For now, return success
     return {
@@ -145,7 +140,7 @@ export class PolymarketExecutionService extends ExecutionServiceBase {
     }
   }
 
-  async getOrderStatus(request: GetOrderStatusRequest): Promise<GetOrderStatusResult> {
+  async getOrderStatus(_request: GetOrderStatusRequest): Promise<GetOrderStatusResult> {
     // In a real implementation, this would fetch order status from Polymarket API
     throw new Error('Order status lookup not yet implemented for Polymarket provider')
   }

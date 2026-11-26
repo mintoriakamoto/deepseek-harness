@@ -8,7 +8,6 @@
 import { randomUUID } from 'node:crypto'
 import { Context } from '@deepseek-ai/cordis'
 import type {
-  ExecutionService,
   OrderId,
   PlaceOrderRequest,
   PlaceOrderResult,
@@ -210,7 +209,7 @@ export class PaperExecutionService extends ExecutionServiceBase {
     return { order }
   }
 
-  async listOrders(): Promise<Order[]> {
+  override async listOrders(): Promise<Order[]> {
     return Array.from(this.orders.values())
   }
 

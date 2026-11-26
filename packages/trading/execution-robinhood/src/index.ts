@@ -14,18 +14,10 @@ import type {
   GetOrderStatusRequest,
   GetOrderStatusResult,
   Order,
-  Fill,
   ValidationConfig,
   ValidationResult,
 } from '@deepseek-ai/dsh-execution'
 import { ExecutionService as ExecutionServiceBase, validateOrder } from '@deepseek-ai/dsh-execution'
-import {
-  validationError,
-  insufficientBalanceError,
-  orderNotFoundError,
-  executionRejectedError,
-  networkError,
-} from '@deepseek-ai/dsh-execution/errors'
 
 /**
  * Configuration for Robinhood execution.
@@ -120,7 +112,7 @@ export class RobinhoodExecutionService extends ExecutionServiceBase {
     return { order }
   }
 
-  async cancelOrder(request: CancelOrderRequest): Promise<CancelOrderResult> {
+  async cancelOrder(_request: CancelOrderRequest): Promise<CancelOrderResult> {
     // In a real implementation, this would call mcp__Robinhood__cancel_equity_order
     // For now, return success without actually cancelling
 
@@ -130,7 +122,7 @@ export class RobinhoodExecutionService extends ExecutionServiceBase {
     }
   }
 
-  async getOrderStatus(request: GetOrderStatusRequest): Promise<GetOrderStatusResult> {
+  async getOrderStatus(_request: GetOrderStatusRequest): Promise<GetOrderStatusResult> {
     // In a real implementation, this would call mcp__Robinhood__get_equity_orders
     // and parse the response to find the order by ID
 

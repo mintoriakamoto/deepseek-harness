@@ -13,7 +13,6 @@ import { Context } from '@deepseek-ai/cordis'
 import type {
   Bar,
   BarInterval,
-  MarketDataError,
   MarketDataProvider,
   Quote,
   QuoteSubscription,
@@ -44,7 +43,7 @@ export class RobinhoodMarketDataProvider implements MarketDataProvider {
   private subscriptionPollingIntervalMs: number
   private debug: boolean
 
-  constructor(ctx: Context, config: RobinhoodMarketDataConfig = {}) {
+  constructor(_ctx: Context, config: RobinhoodMarketDataConfig = {}) {
     this.subscriptionPollingIntervalMs = config.subscriptionPollingIntervalMs ?? 500
     this.debug = config.debug ?? false
   }
@@ -194,8 +193,8 @@ export class RobinhoodMarketDataProvider implements MarketDataProvider {
   /**
    * Sentiment not supported by Robinhood provider (returns empty).
    */
-  async getSentiment(symbols: readonly string[]): Promise<readonly Sentiment[]> {
-    this.log(`getSentiment() — not supported, returning empty`)
+  async getSentiment(_symbols: readonly string[]): Promise<readonly Sentiment[]> {
+    this.log('getSentiment() — not supported, returning empty')
     return []
   }
 

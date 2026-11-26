@@ -6,7 +6,8 @@
  */
 
 import { Context, Service } from '@deepseek-ai/cordis'
-import type {
+
+export type {
   OrderId,
   OrderSide,
   OrderType,
@@ -26,13 +27,7 @@ import type {
   ValidationResult,
 } from './types.ts'
 
-export type {
-  OrderId,
-  OrderSide,
-  OrderType,
-  OrderStatus,
-  TimeInForce,
-  ExecutionStyle,
+import type {
   PlaceOrderRequest,
   PlaceOrderResult,
   CancelOrderRequest,
@@ -40,8 +35,7 @@ export type {
   GetOrderStatusRequest,
   GetOrderStatusResult,
   Order,
-  Fill,
-  ExecutionError,
+  ExecutionStyle,
   ValidationConfig,
   ValidationResult,
 } from './types.ts'

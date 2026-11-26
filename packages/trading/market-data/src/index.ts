@@ -58,7 +58,10 @@ export class MarketDataRegistry extends Service implements MarketDataService {
    * Register a provider implementation. Returns the disposer; disposal removes the provider.
    */
   register(provider: MarketDataProvider): () => void {
-    const fiber = this.ctx[symbols.current]
+    // Access current fiber through cordis internal symbols
+    // Using 'as any' to bypass strict symbol type checking
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fiber = (this.ctx as any)[(symbols as any).current] as Fiber | undefined
     if (!fiber) {
       throw new Error('Provider registration requires active fiber context')
     }

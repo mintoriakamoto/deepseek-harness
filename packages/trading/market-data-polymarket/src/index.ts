@@ -21,7 +21,7 @@ import type {
   QuoteSubscriptionCallback,
   Sentiment,
 } from '@deepseek-ai/dsh-market-data'
-import { createSubscriptionId, MarketDataError } from '@deepseek-ai/dsh-market-data'
+import { MarketDataError } from '@deepseek-ai/dsh-market-data'
 
 /**
  * Configuration for Polymarket provider.
@@ -44,13 +44,9 @@ export interface PolymarketMarketDataConfig {
 export class PolymarketMarketDataProvider implements MarketDataProvider {
   readonly name = 'polymarket'
 
-  private baseUrl: string
-  private timeoutMs: number
   private debug: boolean
 
-  constructor(ctx: Context, config: PolymarketMarketDataConfig = {}) {
-    this.baseUrl = config.baseUrl ?? 'https://clob.polymarket.com'
-    this.timeoutMs = config.timeoutMs ?? 10_000
+  constructor(_ctx: Context, config: PolymarketMarketDataConfig = {}) {
     this.debug = config.debug ?? false
   }
 
@@ -74,7 +70,7 @@ export class PolymarketMarketDataProvider implements MarketDataProvider {
   /**
    * Historical bars not supported for Polymarket (event-driven, not ticker).
    */
-  async getBars(symbol: string, interval: BarInterval, count: number): Promise<readonly Bar[]> {
+  async getBars(symbol: string, _interval: BarInterval, _count: number): Promise<readonly Bar[]> {
     this.log(`getBars(${symbol}) — not supported for Polymarket`)
     throw new MarketDataError(
       'Polymarket is event-driven; historical bars not available. Use dsh-market-data-robinhood for traditional assets.',
@@ -87,7 +83,7 @@ export class PolymarketMarketDataProvider implements MarketDataProvider {
    */
   async subscribe(
     symbol: string,
-    callback: QuoteSubscriptionCallback,
+    _callback: QuoteSubscriptionCallback,
   ): Promise<QuoteSubscription> {
     this.log(`subscribe(${symbol}) — not supported for Polymarket`)
     throw new MarketDataError('Polymarket subscriptions not supported (no websocket feed)', 'OPERATION_NOT_SUPPORTED')
@@ -151,7 +147,8 @@ export class PolymarketMarketDataProvider implements MarketDataProvider {
 
       // Sentiment: map odds to bullish/bearish
       // 0.5+ odds = bullish (yes is likely), <0.5 = bearish (no is likely)
-      const score = quote.price > 0.5 ? (quote.price - 0.5) * 2 : (quote.price - 0.5) * 2
+      // Returns normalized score from -1 (bearish) to +1 (bullish)
+      const score = (quote.price - 0.5) * 2
       const sampleCount = Math.floor(quote.volume / 10_000) || 1
 
       return {
