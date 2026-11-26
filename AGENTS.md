@@ -69,6 +69,7 @@ packages/    @deepseek-ai/dsh-<pkg> workspaces at packages/<group>/<pkg>/
   experimental/         evaluated capabilities without a product-support commitment
   test-support/         test infrastructure
   util/                 zero-dependency utilities
+  trading/              autonomous trading system ([docs/trading-system.md](docs/trading-system.md))
 python/      Python SDK/runtime (python/README.md)
 native/      @deepseek-ai/node-addon-system source (native/README.md)
 benchmarks/  performance gates
@@ -79,6 +80,8 @@ website/     VitePress documentation projection
 ```
 
 Package groups: [packages/README.md](packages/README.md). [Experimental status](packages/experimental/README.md#status) is independent of optional delivery; nonexperimental packages need product use or an explicit [classification](scripts/product-package-policy.ts).
+
+**Trading System:** Multi-asset LLM-powered autonomous trading with Robinhood options and Polymarket prediction markets. See [docs/trading-system.md](docs/trading-system.md) for architecture, edge strategies, and 4-week validation pipeline.
 
 ## Commands
 

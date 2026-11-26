@@ -1,0 +1,34 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./lib",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false
+  },
+  "include": [
+    "*/src/**/*.ts"
+  ],
+  "exclude": [
+    "*/tests/**",
+    "*/lib/**"
+  ],
+  "references": [
+    { "path": "./market-data" },
+    { "path": "./market-data-robinhood" },
+    { "path": "./market-data-polymarket" },
+    { "path": "./market-data-browser" },
+    { "path": "./execution" },
+    { "path": "./execution-paper" },
+    { "path": "./execution-robinhood" },
+    { "path": "./execution-polymarket" },
+    { "path": "./risk-policy" },
+    { "path": "./risk-simple" },
+    { "path": "./llm" },
+    { "path": "./llm-system-prompt" },
+    { "path": "./tool-trading" },
+    { "path": "./preset-trading" }
+  ]
+}

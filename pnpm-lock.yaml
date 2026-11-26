@@ -19861,6 +19861,109 @@ importers:
         specifier: workspace:*
         version: link:../../interaction/user-questions
 
+  packages/trading/execution:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+
+  packages/trading/execution-paper:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+
+  packages/trading/execution-polymarket:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+
+  packages/trading/execution-robinhood:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+
+  packages/trading/llm:
+    dependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+      '@deepseek-ai/dsh-market-data':
+        specifier: workspace:*
+        version: link:../market-data
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:*
+        version: link:../../core/session
+
+  packages/trading/market-data:
+    dependencies:
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+
+  packages/trading/market-data-browser:
+    dependencies:
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-market-data':
+        specifier: workspace:*
+        version: link:../market-data
+
+  packages/trading/market-data-polymarket:
+    dependencies:
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-market-data':
+        specifier: workspace:*
+        version: link:../market-data
+
+  packages/trading/market-data-robinhood:
+    dependencies:
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-market-data':
+        specifier: workspace:*
+        version: link:../market-data
+
   packages/typert/generator:
     dependencies:
       '@jridgewell/gen-mapping':
