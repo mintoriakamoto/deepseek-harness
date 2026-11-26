@@ -375,4 +375,53 @@ describe('CryptocomMarketDataProvider', () => {
 
     expect(sentiment).toEqual([])
   })
+
+  /**
+   * Test 8: Multiple bar intervals.
+   */
+  it('fetches bars with different intervals', async () => {
+    // Mock responses for different intervals
+    ;(global.fetch as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          result: {
+            data: [
+              { o: 42_000, h: 42_500, l: 41_800, c: 42_200, v: 500_000, t: Date.now() },
+            ],
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          result: {
+            data: [
+              { o: 42_200, h: 42_600, l: 41_900, c: 42_300, v: 600_000, t: Date.now() },
+            ],
+          },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          result: {
+            data: [
+              { o: 42_100, h: 42_400, l: 41_800, c: 42_250, v: 550_000, t: Date.now() },
+            ],
+          },
+        }),
+      })
+
+    const bars1m = await provider.getBars('BTC_USD', '1m', 1)
+    const bars5m = await provider.getBars('BTC_USD', '5m', 1)
+    const bars1h = await provider.getBars('BTC_USD', '1h', 1)
+
+    expect(bars1m[0].close).toBe(42_200)
+    expect(bars5m[0].close).toBe(42_300)
+    expect(bars1h[0].close).toBe(42_250)
+
+    // Verify fetch was called 3 times
+    expect(global.fetch).toHaveBeenCalledTimes(3)
+  })
 })
