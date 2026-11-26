@@ -1,0 +1,31 @@
+# OKX Paper Trading Preset
+# Configuration for paper trading mode with OKX crypto market data provider.
+# Useful for backtesting crypto strategies and validating OKX integration.
+
+presets:
+  - name: 'trading-paper-okx'
+    description: 'OKX REST API + paper execution (crypto trading validation)'
+    plugins:
+      # Market data: OKX crypto quotes and order books
+      - '@deepseek-ai/dsh-market-data-okx'
+        config:
+          baseUrl: 'https://www.okx.com/api/v5'
+          subscriptionPollingIntervalMs: 1000
+          timeoutMs: 10000
+          debug: false
+
+      # Execution: paper mode (instant fills with mock slippage)
+      - '@deepseek-ai/dsh-execution-paper'
+        config:
+          slippageBps: 50  # Mock 50bps slippage
+
+      # Risk policy: simple position sizing and Greeks limits
+      - '@deepseek-ai/dsh-risk-simple'
+        config:
+          maxPositionSize: 10  # Max 10 BTC equivalent
+          maxDailyLoss: 0.02   # 2% portfolio loss circuit breaker
+          greekLimits:
+            deltaLimit: 100
+            gammaLimit: 0.1
+            vegaLimit: 1000
+            thetaLimit: -50

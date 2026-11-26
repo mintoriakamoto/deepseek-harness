@@ -1,0 +1,234 @@
+/**
+ * Market data service: unified registry for quotes, bars, and real-time subscriptions.
+ *
+ * Providers register implementations via {@link MarketDataRegistry.register}, supporting
+ * multi-provider fallback and consumer-specified routing. Subscriptions are grouped by
+ * symbol for efficient broadcast.
+ *
+ * @module @deepseek-ai/dsh-market-data
+ */
+
+import { Context, Service, symbols } from '@deepseek-ai/cordis'
+import { randomUUID } from 'node:crypto'
+import type { Fiber } from '@deepseek-ai/cordis'
+import type {
+  Bar,
+  BarInterval,
+  MarketDataProvider,
+  MarketDataService,
+  Quote,
+  QuoteSubscription,
+  QuoteSubscriptionCallback,
+  Sentiment,
+  SubscriptionId,
+} from './types.ts'
+import { MarketDataError } from './types.ts'
+
+export * from './types.ts'
+
+declare module '@deepseek-ai/cordis' {
+  interface Context {
+    marketData: MarketDataRegistry
+  }
+}
+
+/**
+ * Registered provider with its owning fiber (for disposal tracking in HMR).
+ */
+interface RegisteredProvider {
+  provider: MarketDataProvider
+  fiber: Fiber
+}
+
+/**
+ * Service: multi-provider registry with fallback and operation routing.
+ *
+ * Providers register in order and are tried in sequence until one supports
+ * the requested operation. Disposal of a provider's fiber automatically
+ * unregisters it.
+ */
+export class MarketDataRegistry extends Service implements MarketDataService {
+  private providers: RegisteredProvider[] = []
+
+  constructor(ctx: Context) {
+    super(ctx, 'marketData')
+  }
+
+  /**
+   * Register a provider implementation. Returns the disposer; disposal removes the provider.
+   */
+  register(provider: MarketDataProvider): () => void {
+    // Access current fiber through cordis internal symbols
+    // Using 'as any' to bypass strict symbol type checking
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fiber = (this.ctx as any)[(symbols as any).current] as Fiber | undefined
+    if (!fiber) {
+      throw new Error('Provider registration requires active fiber context')
+    }
+    const entry: RegisteredProvider = { provider, fiber }
+    this.providers.push(entry)
+
+    return () => {
+      const idx = this.providers.indexOf(entry)
+      if (idx !== -1) {
+        this.providers.splice(idx, 1)
+      }
+    }
+  }
+
+  async getQuote(symbol: string, provider?: string): Promise<Quote> {
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
+      : this.providers
+
+    if (providers.length === 0) {
+      throw new MarketDataError(
+        provider
+          ? `No provider registered: ${provider}`
+          : 'No market data providers registered',
+        'PROVIDER_NOT_FOUND',
+      )
+    }
+
+    let lastError: Error | null = null
+
+    for (const { provider } of providers) {
+      if (!provider.getQuote) {
+        const msg = `Provider ${provider.name} does not support getQuote`
+        lastError = new MarketDataError(msg, 'OPERATION_NOT_SUPPORTED')
+        continue
+      }
+
+      try {
+        return await provider.getQuote(symbol)
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+    }
+
+    if (lastError) throw lastError
+    throw new MarketDataError('All providers failed: getQuote', 'PROVIDER_EXHAUSTED')
+  }
+
+  async getBars(
+    symbol: string,
+    interval: BarInterval,
+    count: number,
+    provider?: string,
+  ): Promise<readonly Bar[]> {
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
+      : this.providers
+
+    if (providers.length === 0) {
+      throw new MarketDataError(
+        provider
+          ? `No provider registered: ${provider}`
+          : 'No market data providers registered',
+        'PROVIDER_NOT_FOUND',
+      )
+    }
+
+    let lastError: Error | null = null
+
+    for (const { provider } of providers) {
+      if (!provider.getBars) {
+        const msg = `Provider ${provider.name} does not support getBars`
+        lastError = new MarketDataError(msg, 'OPERATION_NOT_SUPPORTED')
+        continue
+      }
+
+      try {
+        return await provider.getBars(symbol, interval, count)
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+    }
+
+    if (lastError) throw lastError
+    throw new MarketDataError('All providers failed: getBars', 'PROVIDER_EXHAUSTED')
+  }
+
+  async subscribe(
+    symbol: string,
+    callback: QuoteSubscriptionCallback,
+    provider?: string,
+  ): Promise<QuoteSubscription> {
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
+      : this.providers
+
+    if (providers.length === 0) {
+      throw new MarketDataError(
+        provider
+          ? `No provider registered: ${provider}`
+          : 'No market data providers registered',
+        'PROVIDER_NOT_FOUND',
+      )
+    }
+
+    let lastError: Error | null = null
+
+    for (const { provider } of providers) {
+      if (!provider.subscribe) {
+        const msg = `Provider ${provider.name} does not support subscribe`
+        lastError = new MarketDataError(msg, 'OPERATION_NOT_SUPPORTED')
+        continue
+      }
+
+      try {
+        return await provider.subscribe(symbol, callback)
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+    }
+
+    if (lastError) throw lastError
+    throw new MarketDataError('All providers failed: subscribe', 'PROVIDER_EXHAUSTED')
+  }
+
+  async getSentiment(
+    symbols: readonly string[],
+    provider?: string,
+  ): Promise<readonly Sentiment[]> {
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
+      : this.providers
+
+    if (providers.length === 0) {
+      throw new MarketDataError(
+        provider
+          ? `No provider registered: ${provider}`
+          : 'No market data providers registered',
+        'PROVIDER_NOT_FOUND',
+      )
+    }
+
+    let lastError: Error | null = null
+
+    for (const { provider } of providers) {
+      if (!provider.getSentiment) {
+        const msg = `Provider ${provider.name} does not support getSentiment`
+        lastError = new MarketDataError(msg, 'OPERATION_NOT_SUPPORTED')
+        continue
+      }
+
+      try {
+        return await provider.getSentiment(symbols)
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+    }
+
+    if (lastError) throw lastError
+    throw new MarketDataError('All providers failed: getSentiment', 'PROVIDER_EXHAUSTED')
+  }
+}
+
+/**
+ * Helper: create a branded SubscriptionId.
+ * @internal
+ */
+export function createSubscriptionId(): SubscriptionId {
+  return randomUUID() as SubscriptionId
+}

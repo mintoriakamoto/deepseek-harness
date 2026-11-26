@@ -661,6 +661,15 @@
     { "path": "./apps/cli" },
     { "path": "./apps/plugin-market-generator" },
     { "path": "./apps/desktop-host" },
-    { "path": "./apps/desktop/tsconfig.host.json" }
+    { "path": "./apps/desktop/tsconfig.host.json" },
+    { "path": "./packages/trading/market-data" },
+    { "path": "./packages/trading/market-data-robinhood" },
+    { "path": "./packages/trading/market-data-polymarket" },
+    { "path": "./packages/trading/market-data-browser" },
+    { "path": "./packages/trading/market-data-okx" },
+    { "path": "./packages/trading/execution" },
+    { "path": "./packages/trading/execution-paper" },
+    { "path": "./packages/trading/execution-robinhood" },
+    { "path": "./packages/trading/execution-polymarket" }
   ]
 }
