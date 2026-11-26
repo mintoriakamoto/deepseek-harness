@@ -11,7 +11,6 @@
 import { Context, Service, symbols } from '@deepseek-ai/cordis'
 import { randomUUID } from 'node:crypto'
 import type { Fiber } from '@deepseek-ai/cordis'
-import type { Branded } from '@deepseek-ai/dsh-brand'
 import type {
   Bar,
   BarInterval,
@@ -59,7 +58,10 @@ export class MarketDataRegistry extends Service implements MarketDataService {
    * Register a provider implementation. Returns the disposer; disposal removes the provider.
    */
   register(provider: MarketDataProvider): () => void {
-    const fiber = this.ctx[symbols.current]!
+    const fiber = this.ctx[symbols.current]
+    if (!fiber) {
+      throw new Error('Provider registration requires active fiber context')
+    }
     const entry: RegisteredProvider = { provider, fiber }
     this.providers.push(entry)
 
@@ -71,15 +73,15 @@ export class MarketDataRegistry extends Service implements MarketDataService {
     }
   }
 
-  async getQuote(symbol: string, providerFilter?: string): Promise<Quote> {
-    const providers = providerFilter
-      ? this.providers.filter(p => p.provider.name === providerFilter)
+  async getQuote(symbol: string, provider?: string): Promise<Quote> {
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
       : this.providers
 
     if (providers.length === 0) {
       throw new MarketDataError(
-        providerFilter
-          ? `No provider registered: ${providerFilter}`
+        provider
+          ? `No provider registered: ${provider}`
           : 'No market data providers registered',
         'PROVIDER_NOT_FOUND',
       )
@@ -109,16 +111,16 @@ export class MarketDataRegistry extends Service implements MarketDataService {
     symbol: string,
     interval: BarInterval,
     count: number,
-    providerFilter?: string,
+    provider?: string,
   ): Promise<readonly Bar[]> {
-    const providers = providerFilter
-      ? this.providers.filter(p => p.provider.name === providerFilter)
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
       : this.providers
 
     if (providers.length === 0) {
       throw new MarketDataError(
-        providerFilter
-          ? `No provider registered: ${providerFilter}`
+        provider
+          ? `No provider registered: ${provider}`
           : 'No market data providers registered',
         'PROVIDER_NOT_FOUND',
       )
@@ -147,16 +149,16 @@ export class MarketDataRegistry extends Service implements MarketDataService {
   async subscribe(
     symbol: string,
     callback: QuoteSubscriptionCallback,
-    providerFilter?: string,
+    provider?: string,
   ): Promise<QuoteSubscription> {
-    const providers = providerFilter
-      ? this.providers.filter(p => p.provider.name === providerFilter)
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
       : this.providers
 
     if (providers.length === 0) {
       throw new MarketDataError(
-        providerFilter
-          ? `No provider registered: ${providerFilter}`
+        provider
+          ? `No provider registered: ${provider}`
           : 'No market data providers registered',
         'PROVIDER_NOT_FOUND',
       )
@@ -184,16 +186,16 @@ export class MarketDataRegistry extends Service implements MarketDataService {
 
   async getSentiment(
     symbols: readonly string[],
-    providerFilter?: string,
+    provider?: string,
   ): Promise<readonly Sentiment[]> {
-    const providers = providerFilter
-      ? this.providers.filter(p => p.provider.name === providerFilter)
+    const providers = provider
+      ? this.providers.filter(p => p.provider.name === provider)
       : this.providers
 
     if (providers.length === 0) {
       throw new MarketDataError(
-        providerFilter
-          ? `No provider registered: ${providerFilter}`
+        provider
+          ? `No provider registered: ${provider}`
           : 'No market data providers registered',
         'PROVIDER_NOT_FOUND',
       )

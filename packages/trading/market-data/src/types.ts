@@ -167,11 +167,11 @@ export interface MarketDataService {
    * Fetch a real-time quote for one symbol.
    *
    * @param symbol - Instrument identifier (ticker or option contract).
-   * @param provider - Optional provider filter; uses first available if omitted.
+   * @param provider - Optional provider name filter; uses first available if omitted.
    * @returns Current quote with price, Greeks (if applicable), and metadata.
    * @throws {@link MarketDataError} on network, auth, or symbol-not-found errors.
    */
-  getQuote(symbol: string, provider?: MarketDataProvider): Promise<Quote>
+  getQuote(symbol: string, provider?: string): Promise<Quote>
 
   /**
    * Fetch historical OHLCV bars for one symbol.
@@ -179,7 +179,7 @@ export interface MarketDataService {
    * @param symbol - Instrument identifier.
    * @param interval - Bar granularity: 1m, 5m, 15m, 1h, 1d.
    * @param count - Maximum number of bars to return (most recent first). Common: 20-100.
-   * @param provider - Optional provider filter; uses first available if omitted.
+   * @param provider - Optional provider name filter; uses first available if omitted.
    * @returns Array of bars in ascending time order (oldest first).
    * @throws {@link MarketDataError} on network, auth, or symbol-not-found errors.
    */
@@ -187,7 +187,7 @@ export interface MarketDataService {
     symbol: string,
     interval: BarInterval,
     count: number,
-    provider?: MarketDataProvider,
+    provider?: string,
   ): Promise<readonly Bar[]>
 
   /**
@@ -196,7 +196,7 @@ export interface MarketDataService {
    *
    * @param symbol - Instrument identifier.
    * @param callback - Invoked on each quote update; may be async (awaited).
-   * @param provider - Optional provider filter; uses first available if omitted.
+   * @param provider - Optional provider name filter; uses first available if omitted.
    * @returns Subscription handle with {@link QuoteSubscription.dispose} to unsubscribe.
    * @throws {@link MarketDataError} on network, auth, or symbol-not-found errors.
    *
@@ -212,16 +212,16 @@ export interface MarketDataService {
   subscribe(
     symbol: string,
     callback: QuoteSubscriptionCallback,
-    provider?: MarketDataProvider,
+    provider?: string,
   ): Promise<QuoteSubscription>
 
   /**
    * Fetch aggregated sentiment for one or more symbols.
    *
    * @param symbols - Array of instrument identifiers.
-   * @param provider - Optional provider filter; uses browser scraper if omitted.
+   * @param provider - Optional provider name filter; uses browser scraper if omitted.
    * @returns Array of sentiment metrics.
    * @throws {@link MarketDataError} on network or scraper errors.
    */
-  getSentiment(symbols: readonly string[], provider?: MarketDataProvider): Promise<readonly Sentiment[]>
+  getSentiment(symbols: readonly string[], provider?: string): Promise<readonly Sentiment[]>
 }
