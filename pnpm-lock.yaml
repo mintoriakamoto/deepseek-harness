@@ -17455,6 +17455,24 @@ importers:
         specifier: workspace:*
         version: link:../execution
 
+  packages/trading/llm:
+    dependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-execution':
+        specifier: workspace:*
+        version: link:../execution
+      '@deepseek-ai/dsh-market-data':
+        specifier: workspace:*
+        version: link:../market-data
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:*
+        version: link:../../core/session
+
   packages/trading/market-data:
     dependencies:
       '@deepseek-ai/dsh-brand':
